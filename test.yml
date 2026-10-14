@@ -1,0 +1,36 @@
+name: AWS Lambda Python Test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Lambda tests
+        run: |
+          python - <<'PY'
+          from lambda_function import lambda_handler
+
+          result = lambda_handler({"a": 10, "b": 20}, None)
+          print(result)
+
+          assert result["statusCode"] == 200
+          assert result["body"] == "Нәтиже: 30"
+
+          print("ALL TESTS PASSED")
+          PY
