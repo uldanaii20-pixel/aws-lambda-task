@@ -11,26 +11,29 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Run Lambda tests
         run: |
           python - <<'PY'
+          import json
           from lambda_function import lambda_handler
 
-          result = lambda_handler({"a": 10, "b": 20}, None)
-          print(result)
+          result = lambda_handler(
+              {"length": 6, "width": 7}, None
+          )
+
+          body = json.loads(result["body"])
 
           assert result["statusCode"] == 200
-          assert result["body"] == "Нәтиже: 30"
+          assert body["length"] == 6
+          assert body["width"] == 7
+          assert body["area"] == 42
 
           print("ALL TESTS PASSED")
           PY
